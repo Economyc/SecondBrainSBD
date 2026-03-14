@@ -142,3 +142,95 @@ export interface Contact {
   createdAt: string;
   updatedAt: string;
 }
+
+// ── Budgets ──
+
+export type BudgetPeriod = 'monthly' | 'yearly';
+
+export interface Budget {
+  id: string;
+  category: string;
+  amount: number;
+  period: BudgetPeriod;
+  month?: string;   // 'yyyy-MM' for monthly
+  year?: number;     // for yearly
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ── Investments ──
+
+export type InvestmentType = 'stocks' | 'crypto' | 'funds' | 'real_estate' | 'bonds' | 'savings' | 'other';
+
+export interface InvestmentEntry {
+  id: string;
+  date: string;
+  type: 'buy' | 'sell' | 'dividend' | 'valuation';
+  units?: number;
+  pricePerUnit?: number;
+  totalAmount: number;
+  notes?: string;
+}
+
+export interface Investment {
+  id: string;
+  name: string;
+  type: InvestmentType;
+  currentValue: number;
+  entries: InvestmentEntry[];
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const INVESTMENT_TYPES: { value: InvestmentType; label: string }[] = [
+  { value: 'stocks', label: 'Acciones' },
+  { value: 'crypto', label: 'Cripto' },
+  { value: 'funds', label: 'Fondos' },
+  { value: 'real_estate', label: 'Inmuebles' },
+  { value: 'bonds', label: 'Bonos' },
+  { value: 'savings', label: 'CDT / Ahorro' },
+  { value: 'other', label: 'Otro' },
+];
+
+// ── Credits / Loans ──
+
+export type CreditType = 'mortgage' | 'car' | 'personal' | 'credit_card' | 'student' | 'business' | 'other';
+export type CreditStatus = 'active' | 'paid_off';
+
+export interface CreditPayment {
+  id: string;
+  date: string;
+  amount: number;
+  principal: number;
+  interest: number;
+  notes?: string;
+}
+
+export interface Credit {
+  id: string;
+  name: string;
+  type: CreditType;
+  status: CreditStatus;
+  originalAmount: number;
+  remainingBalance: number;
+  interestRate: number;
+  monthlyPayment: number;
+  startDate: string;
+  endDate?: string;
+  payments: CreditPayment[];
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const CREDIT_TYPES: { value: CreditType; label: string }[] = [
+  { value: 'mortgage', label: 'Hipoteca' },
+  { value: 'car', label: 'Vehículo' },
+  { value: 'personal', label: 'Personal' },
+  { value: 'credit_card', label: 'Tarjeta de Crédito' },
+  { value: 'student', label: 'Estudiantil' },
+  { value: 'business', label: 'Empresarial' },
+  { value: 'other', label: 'Otro' },
+];

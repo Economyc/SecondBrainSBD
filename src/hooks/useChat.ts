@@ -16,11 +16,59 @@ export function useChat({ onMessageComplete }: UseChatOptions) {
   const [searchResults, setSearchResults] = useState<{ title: string; url: string; snippet: string }[]>([]);
   const abortRef = useRef<AbortController | null>(null);
 
+  // Typewriter buffer refs
+  const bufferRef = useRef('');
+  const displayedRef = useRef(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startTypewriter = useCallback(() => {
+    if (intervalRef.current) return;
+    intervalRef.current = setInterval(() => {
+      const buffer = bufferRef.current;
+      const displayed = displayedRef.current;
+      if (displayed >= buffer.length) return;
+      // Speed up if buffer is getting too far ahead
+      const pending = buffer.length - displayed;
+      const charsToReveal = pending > 80 ? 6 : pending > 30 ? 4 : 2;
+      const next = Math.min(displayed + charsToReveal, buffer.length);
+      displayedRef.current = next;
+      setStreamingContent(buffer.slice(0, next));
+    }, 15);
+  }, []);
+
+  const stopTypewriter = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  const flushBuffer = useCallback(() => {
+    stopTypewriter();
+    if (bufferRef.current) {
+      setStreamingContent(bufferRef.current);
+      displayedRef.current = bufferRef.current.length;
+    }
+  }, [stopTypewriter]);
+
+  const resetBuffer = useCallback(() => {
+    stopTypewriter();
+    bufferRef.current = '';
+    displayedRef.current = 0;
+    setStreamingContent('');
+  }, [stopTypewriter]);
+
+  const onChunk = useCallback((chunk: string) => {
+    bufferRef.current += chunk;
+    startTypewriter();
+  }, [startTypewriter]);
+
   const stopStreaming = useCallback(() => {
     abortRef.current?.abort();
     abortRef.current = null;
+    stopTypewriter();
     setIsStreaming(false);
-  }, []);
+  }, [stopTypewriter]);
 
   const sendMessage = useCallback(async (
     convId: string,
@@ -53,7 +101,7 @@ export function useChat({ onMessageComplete }: UseChatOptions) {
     const allMessages = [systemMsg, ...existingMessages, userMessage];
 
     setIsStreaming(true);
-    setStreamingContent('');
+    resetBuffer();
     setSearchResults([]);
 
     const controller = new AbortController();
@@ -67,7 +115,7 @@ export function useChat({ onMessageComplete }: UseChatOptions) {
     try {
       result = await streamFn(
         allMessages,
-        { onChunk: (chunk) => setStreamingContent(prev => prev + chunk) },
+        { onChunk },
         controller.signal,
       );
     } catch (err: unknown) {
@@ -85,12 +133,12 @@ export function useChat({ onMessageComplete }: UseChatOptions) {
       }
 
       provider = fallbackProvider;
-      setStreamingContent('');
+      resetBuffer();
       const fallbackFn = provider === 'groq' ? streamGroq : streamGemini;
       try {
         result = await fallbackFn(
           allMessages,
-          { onChunk: (chunk) => setStreamingContent(prev => prev + chunk) },
+          { onChunk },
           controller.signal,
         );
       } catch (fallbackErr) {
@@ -148,12 +196,12 @@ export function useChat({ onMessageComplete }: UseChatOptions) {
         ...toolResultMessages,
       ];
 
-      setStreamingContent('');
+      resetBuffer();
 
       try {
         const summaryResult = await streamFn(
           messagesWithToolResults,
-          { onChunk: (chunk) => setStreamingContent(prev => prev + chunk) },
+          { onChunk },
           controller.signal,
         );
 
@@ -180,9 +228,10 @@ export function useChat({ onMessageComplete }: UseChatOptions) {
       await onMessageComplete(convId, assistantMessage);
     }
 
+    flushBuffer();
     setIsStreaming(false);
     setStreamingContent('');
-  }, [onMessageComplete]);
+  }, [onMessageComplete, onChunk, resetBuffer, flushBuffer]);
 
   return { streamingContent, isStreaming, searchResults, sendMessage, stopStreaming };
 }

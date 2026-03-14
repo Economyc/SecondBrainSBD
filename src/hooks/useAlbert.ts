@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
-import { onSnapshot, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { onSnapshot, setDoc, updateDoc, deleteDoc, arrayUnion } from 'firebase/firestore';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { getCol, getDocRef } from '@/lib/firestore';
 import type { Conversation, ChatMessage } from '@/types';
@@ -50,14 +50,11 @@ export function useAlbert() {
   }, [environment, activeConversationId]);
 
   const addMessage = useCallback(async (convId: string, message: ChatMessage) => {
-    const conv = conversations.find(c => c.id === convId);
-    if (!conv) return;
-    const updatedMessages = [...conv.messages, message];
     await updateDoc(getDocRef(environment, COLLECTION, convId), {
-      messages: updatedMessages,
+      messages: arrayUnion(message),
       updatedAt: new Date().toISOString(),
     });
-  }, [environment, conversations]);
+  }, [environment]);
 
   const updateConversation = useCallback(async (id: string, updates: Partial<Conversation>) => {
     await updateDoc(getDocRef(environment, COLLECTION, id), {

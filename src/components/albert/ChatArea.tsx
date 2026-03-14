@@ -37,15 +37,23 @@ export function ChatArea({
 
   if (!conversation) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-4">
-        <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-          <Bot className="h-8 w-8 text-primary" />
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-4">
+          <div className="h-16 w-16 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+            <Bot className="h-8 w-8 text-orange-500 dark:text-orange-400" />
+          </div>
+          <div className="text-center">
+            <h3 className="font-semibold text-foreground text-lg">Albert</h3>
+            <p className="text-sm mt-1">Tu asistente IA personal</p>
+            <p className="text-xs mt-2">Escribe un mensaje para comenzar</p>
+          </div>
         </div>
-        <div className="text-center">
-          <h3 className="font-semibold text-foreground text-lg">Albert</h3>
-          <p className="text-sm mt-1">Tu asistente IA personal</p>
-          <p className="text-xs mt-2">Selecciona o crea una conversación para empezar</p>
-        </div>
+        <ChatInput
+          onSend={onSend}
+          onStop={onStop}
+          isStreaming={isStreaming}
+          disabled={disabled}
+        />
       </div>
     );
   }
@@ -57,7 +65,7 @@ export function ChatArea({
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         {messages.length === 0 && !isStreaming && (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-3">
-            <Bot className="h-10 w-10 text-primary/40" />
+            <Bot className="h-10 w-10 text-orange-400/60 dark:text-orange-500/40" />
             <p className="text-sm">¿En qué puedo ayudarte?</p>
           </div>
         )}

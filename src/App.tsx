@@ -10,6 +10,7 @@ import Tasks from "./pages/Tasks";
 import Documents from "./pages/Documents";
 import Finances from "./pages/Finances";
 import Contacts from "./pages/Contacts";
+import Albert from "./pages/Albert";
 
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/documents" element={<Documents />} />
             <Route path="/finances" element={<Finances />} />
             <Route path="/contacts" element={<Contacts />} />
+            <Route path="/albert" element={<Albert />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

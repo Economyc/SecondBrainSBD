@@ -234,3 +234,32 @@ export const CREDIT_TYPES: { value: CreditType; label: string }[] = [
   { value: 'business', label: 'Empresarial' },
   { value: 'other', label: 'Otro' },
 ];
+
+// ── Albert (AI Agent) ──
+
+export type AIProvider = 'groq' | 'gemini';
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  provider?: AIProvider;
+  toolCalls?: ToolCallRecord[];
+  createdAt: string;
+}
+
+export interface ToolCallRecord {
+  id: string;
+  name: string;
+  arguments: string;
+  result?: string;
+}
+
+export interface Conversation {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  model: string;
+  createdAt: string;
+  updatedAt: string;
+}

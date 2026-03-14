@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Home, CheckSquare, FileText, DollarSign, Users, User, Briefcase, ChevronsUpDown, Lock, Unlock, Settings2, Eye, EyeOff, Search } from 'lucide-react';
+import { Home, CheckSquare, FileText, DollarSign, Users, User, Briefcase, ChevronsUpDown, Lock, Unlock, Settings2, Eye, EyeOff, Search, Bot } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
@@ -46,6 +46,7 @@ const DEFAULT_MODULES: ModuleItem[] = [
   { id: 'documents', title: 'Documentos', url: '/documents', icon: FileText },
   { id: 'finances', title: 'Finanzas', url: '/finances', icon: DollarSign },
   { id: 'contacts', title: 'Contactos', url: '/contacts', icon: Users },
+  { id: 'albert', title: 'Albert', url: '/albert', icon: Bot },
 ];
 
 const STORAGE_KEY = 'secondbrain:module-order';
